@@ -1,0 +1,38 @@
+{
+  "name": "typecraft",
+  "version": "1.0.0",
+  "description": "Minecraft Clone in TypeScript",
+  "main": "src/index.ts",
+  "scripts": {
+    "test": "ts-node test.ts",
+    "build": "tsc",
+    "start": "ts-node src/index.ts",
+    "server": "ts-node src/server.ts",
+    "mc-server": "cd server && java -jar server.jar nogui"
+  },
+  "keywords": [
+    "minecraft",
+    "beta 1.7.3",
+    "clone",
+    "game"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^17.0.21",
+    "ts-node": "^10.7.0",
+    "typescript": "^4.6.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/N1ghtTheF0x/TypeCraft.git"
+  },
+  "author": {
+    "name": "N1ghtTheF0x",
+    "email": "kilo.night.prower@gmail.com",
+    "url": "https://github.com/N1ghtTheF0x"
+  },
+  "bugs": {
+    "url": "https://github.com/N1ghtTheF0x/TypeCraft/issues"
+  },
+  "homepage": "https://github.com/N1ghtTheF0x/TypeCraft#readme"
+}

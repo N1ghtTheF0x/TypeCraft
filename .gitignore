@@ -102,3 +102,15 @@ dist
 
 # TernJS port file
 .tern-port
+
+# testing files from packets
+
+*.bin
+
+# server files
+
+server/*
+
+# .gitkeep
+
+!.gitkeep
