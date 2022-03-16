@@ -1,0 +1,171 @@
+case Packet.Type.KeepAlive:
+	arr.push(new Server.KeepAlivePacket(data))
+	break
+case Packet.Type.LoginRequest:
+	arr.push(new Server.LoginRequestPacket(data))
+	break
+case Packet.Type.Handshake:
+	arr.push(new Server.HandshakePacket(data))
+	break
+case Packet.Type.ChatMessage:
+	arr.push(new Server.ChatMessagePacket(data))
+	break
+case Packet.Type.TimeUpdate:
+	arr.push(new Server.TimeUpdatePacket(data))
+	break
+case Packet.Type.EntityEquipment:
+	arr.push(new Server.EntityEquipmentPacket(data))
+	break
+case Packet.Type.SpawnPosition:
+	arr.push(new Server.SpawnPositionPacket(data))
+	break
+case Packet.Type.UseEntity:
+	arr.push(new Server.UseEntityPacket(data))
+	break
+case Packet.Type.UpdateHealth:
+	arr.push(new Server.UpdateHealthPacket(data))
+	break
+case Packet.Type.Respawn:
+	arr.push(new Server.RespawnPacket(data))
+	break
+case Packet.Type.Player:
+	arr.push(new Server.PlayerPacket(data))
+	break
+case Packet.Type.PlayerPosition:
+	arr.push(new Server.PlayerPositionPacket(data))
+	break
+case Packet.Type.PlayerLook:
+	arr.push(new Server.PlayerLookPacket(data))
+	break
+case Packet.Type.PlayerPositionAndLook:
+	arr.push(new Server.PlayerPositionAndLookPacket(data))
+	break
+case Packet.Type.PlayerDigging:
+	arr.push(new Server.PlayerDiggingPacket(data))
+	break
+case Packet.Type.PlayerBlockPlacement:
+	arr.push(new Server.PlayerBlockPlacementPacket(data))
+	break
+case Packet.Type.HoldingChange:
+	arr.push(new Server.HoldingChangePacket(data))
+	break
+case Packet.Type.UseBed:
+	arr.push(new Server.UseBedPacket(data))
+	break
+case Packet.Type.Animation:
+	arr.push(new Server.AnimationPacket(data))
+	break
+case Packet.Type.EntityAction:
+	arr.push(new Server.EntityActionPacket(data))
+	break
+case Packet.Type.NamedEntitySpawn:
+	arr.push(new Server.NamedEntitySpawnPacket(data))
+	break
+case Packet.Type.PickupSpawn:
+	arr.push(new Server.PickupSpawnPacket(data))
+	break
+case Packet.Type.CollectItem:
+	arr.push(new Server.CollectItemPacket(data))
+	break
+case Packet.Type.AddObjectVehicle:
+	arr.push(new Server.AddObjectVehiclePacket(data))
+	break
+case Packet.Type.MobSpawn:
+	arr.push(new Server.MobSpawnPacket(data))
+	break
+case Packet.Type.EntityPainting:
+	arr.push(new Server.EntityPaintingPacket(data))
+	break
+case Packet.Type.StanceUpdate:
+	arr.push(new Server.StanceUpdatePacket(data))
+	break
+case Packet.Type.EntityVelocity:
+	arr.push(new Server.EntityVelocityPacket(data))
+	break
+case Packet.Type.DestroyEntity:
+	arr.push(new Server.DestroyEntityPacket(data))
+	break
+case Packet.Type.Entity:
+	arr.push(new Server.EntityPacket(data))
+	break
+case Packet.Type.EntityRelativeMove:
+	arr.push(new Server.EntityRelativeMovePacket(data))
+	break
+case Packet.Type.EntityLook:
+	arr.push(new Server.EntityLookPacket(data))
+	break
+case Packet.Type.EntityLookAndRelativeMove:
+	arr.push(new Server.EntityLookAndRelativeMovePacket(data))
+	break
+case Packet.Type.EntityTeleport:
+	arr.push(new Server.EntityTeleportPacket(data))
+	break
+case Packet.Type.EntityStatus:
+	arr.push(new Server.EntityStatusPacket(data))
+	break
+case Packet.Type.AttachEntity:
+	arr.push(new Server.AttachEntityPacket(data))
+	break
+case Packet.Type.EntityMetadata:
+	arr.push(new Server.EntityMetadataPacket(data))
+	break
+case Packet.Type.PreChunk:
+	arr.push(new Server.PreChunkPacket(data))
+	break
+case Packet.Type.MapChunk:
+	arr.push(new Server.MapChunkPacket(data))
+	break
+case Packet.Type.MultiBlockChange:
+	arr.push(new Server.MultiBlockChangePacket(data))
+	break
+case Packet.Type.BlockChange:
+	arr.push(new Server.BlockChangePacket(data))
+	break
+case Packet.Type.BlockAction:
+	arr.push(new Server.BlockActionPacket(data))
+	break
+case Packet.Type.Explosion:
+	arr.push(new Server.ExplosionPacket(data))
+	break
+case Packet.Type.SoundEffect:
+	arr.push(new Server.SoundEffectPacket(data))
+	break
+case Packet.Type.NewInvalidState:
+	arr.push(new Server.NewInvalidStatePacket(data))
+	break
+case Packet.Type.Thunderbolt:
+	arr.push(new Server.ThunderboltPacket(data))
+	break
+case Packet.Type.OpenWindow:
+	arr.push(new Server.OpenWindowPacket(data))
+	break
+case Packet.Type.CloseWindow:
+	arr.push(new Server.CloseWindowPacket(data))
+	break
+case Packet.Type.WindowClick:
+	arr.push(new Server.WindowClickPacket(data))
+	break
+case Packet.Type.SetSlot:
+	arr.push(new Server.SetSlotPacket(data))
+	break
+case Packet.Type.WindowItems:
+	arr.push(new Server.WindowItemsPacket(data))
+	break
+case Packet.Type.UpdateProgressBar:
+	arr.push(new Server.UpdateProgressBarPacket(data))
+	break
+case Packet.Type.Transaction:
+	arr.push(new Server.TransactionPacket(data))
+	break
+case Packet.Type.UpdateSign:
+	arr.push(new Server.UpdateSignPacket(data))
+	break
+case Packet.Type.ItemData:
+	arr.push(new Server.ItemDataPacket(data))
+	break
+case Packet.Type.IncrementStatistic:
+	arr.push(new Server.IncrementStatisticPacket(data))
+	break
+case Packet.Type.DisconnectKick:
+	arr.push(new Server.DisconnectKickPacket(data))
+	break

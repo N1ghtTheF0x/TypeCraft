@@ -1,5 +1,15 @@
-import { Client } from "./src/packet"
+import { appendFileSync } from "fs"
+import { OBuffer } from "./src/buffer"
+import { Packet, Server } from "./src/packet"
 
-const p = new Client.PlayerPositionAndLookPacket(0,1,2,3,4,5,true)
 
-console.info(JSON.stringify(p))
+
+for(const [name,index] of Object.entries(Packet.Type))
+{
+    if(typeof index != "number") continue
+    var text = "case Packet.Type."
+    text += `${name}:\n`
+    text += `\tarr.push(new Server.${name}Packet(data))\n`
+    text += "\tbreak\n"
+    appendFileSync("test.txt",text,"utf-8")
+}
