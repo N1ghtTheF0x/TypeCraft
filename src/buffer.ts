@@ -116,6 +116,10 @@ export class OBuffer
         }
         return String.fromCharCode(...chars)
     }
+    readString8()
+    {
+        
+    }
     writeBool(bool: boolean)
     {
         return this.writeByte(bool ? 0x01 : 0x00)

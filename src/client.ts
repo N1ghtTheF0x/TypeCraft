@@ -1,6 +1,6 @@
 import { createConnection, Socket } from "net"
 import { OBuffer } from "./buffer"
-import { Packet, Server } from "./packet"
+import { Packet, Server } from "./packets"
 
 export type ServerResponse = (data: OBuffer) => void
 
