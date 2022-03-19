@@ -1,3 +1,5 @@
+import EventEmitter = require("events")
+
 export const MAX_STRING_LENGTH = 16
 export const VERSION = 14 // Minecraft Beta 1.7.4, 2011-6-30
 
@@ -5,6 +7,7 @@ export enum DataType
 {
     byte = 1,
     short = 2,
+    char = 2,
     int = 4,
     long = 8,
     float = 4,

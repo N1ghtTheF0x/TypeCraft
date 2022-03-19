@@ -36,6 +36,20 @@ export class OBuffer
         //if(this.__read_and_delete) this.buf = this.buf.slice(this.read_offset)
         return value
     }
+    writeChar(char: string)
+    {
+        const letter = char.substring(0,1)
+        const code = letter.charCodeAt(0)
+        this.buf.writeInt16BE(code,this.write_offset)
+        this.write_offset += DataType.char
+        return this
+    }
+    readChar()
+    {
+        const code = this.buf.readInt16BE(this.read_offset)
+        this.read_offset += DataType.char
+        return String.fromCharCode(code)
+    }
     writeShort(short: number)
     {
         this.buf.writeInt16BE(short,this.write_offset)
@@ -107,15 +121,17 @@ export class OBuffer
         for(const char of str) this.writeShort(char.charCodeAt(0))
         return this
     }
-    readString16()
+    readString16(): string
+    readString16(size: number): string
+    readString16(a?: number)
     {
-        const size = this.readShort()
-        const chars: number[] = []
+        const size = a ?? this.readShort()
+        const chars: string[] = []
         for(var i = 0;i < size;i++)
         {
-            chars.push(this.readShort())
+            chars.push(this.readChar())
         }
-        return String.fromCharCode(...chars)
+        return chars.join()
     }
     writeString8(str: string)
     {

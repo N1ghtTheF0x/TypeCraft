@@ -66,11 +66,11 @@ export class ChatMessage extends Packet
     constructor(msg: string)
     {
         super(0x03)
-        this.message = msg
+        this.message = msg.substring(0,119)
     }
     toBuffer()
     {
-        const buffer = new OBuffer(3+MAX_STRING_LENGTH)
+        const buffer = new OBuffer(3+(this.message.length*2))
         buffer.writeByte(this.id)
         buffer.writeString16(this.message)
         return buffer    

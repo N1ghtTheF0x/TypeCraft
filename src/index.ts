@@ -1,32 +1,44 @@
 import { writeFileSync } from "fs"
 import { Client } from "./client"
 import { Packet } from "./packets"
-import { Entity, LoginRequest, MapChunk, PlayerPositionAndLook, PreChunk } from "./packets/server"
+import { ChatMessage, Entity, LoginRequest, MapChunk, NamedEntitySpawn, PlayerPositionAndLook, PreChunk, TimeUpdate, UpdateHealth } from "./packets/server"
 import * as PacketClient from "./packets/client"
+import { randomBytes } from "crypto"
+import { TPS } from "./tick"
+import { OBuffer } from "./buffer"
 
 const host = "127.0.0.1"
 const port = 25565
 
-const username = "NodeJS"
+const username = randomBytes(4).toString("hex")
 
 const client = new Client(username,host,port)
 
-var player_interval: NodeJS.Timer
+const list = []
 
-client.on("LoginRequest",function(packet: LoginRequest)
+client.on("Ready",function()
 {
-    player_interval = setInterval(function()
+    setTimeout(function()
     {
-        client.sendPacket(new PacketClient.Player(false))
-    },50)
+        writeFileSync("packets.json",JSON.stringify(list,function(key,value)
+        {
+            if(typeof value == "bigint") return value.toString()
+            if(key == "id") return Packet.Type[value]
+            if(value instanceof OBuffer) return `Buffer[${value.getBuffer().length}]`
+            return value
+        }),"utf-8")
+        process.exit()
+    },1000*5)
 })
-client.on("PreChunk",function(packet: PreChunk)
+
+client.on("Packets",function(packets: Packet[])
 {
-    console.dir(packet.toJSON())
+    list.push(...packets)
 })
-client.on("MapChunk",function(packet: MapChunk)
+
+client.on("end",function()
 {
-    console.dir(packet.toJSON())
+    process.exit()
 })
 
 client.connect()

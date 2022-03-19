@@ -2,7 +2,9 @@ import { OBuffer } from "../buffer"
 import { Packet as _Packet } from "."
 import { DataType, Direction } from "../types"
 import { Metadata } from "./metadata"
-import { createInflate } from "zlib"
+import { inflateSync } from "zlib"
+import { existsSync, mkdirSync, writeFileSync } from "fs"
+import { resolve } from "path"
 
 export abstract class Packet extends _Packet
 {
@@ -17,7 +19,14 @@ export abstract class Packet extends _Packet
     toBuffer()
     {
         return this.raw
-    } 
+    }
+    dump()
+    {
+        const date = new Date()
+        const path = resolve(process.cwd(),"dump")
+        if(!existsSync(path)) mkdirSync(path)
+        writeFileSync(resolve(path,`packet-${this.id.toString(16)}-${date.getDate()}${date.getMonth()}${date.getFullYear()}-${date.getHours()}${date.getMinutes()}${date.getSeconds()}${date.getMilliseconds()}.bin`),this.raw.getBuffer())
+    }
 }
 
 export function parse(data: OBuffer)
@@ -207,7 +216,7 @@ export class KeepAlive extends Packet
 export class LoginRequest extends Packet
 {
     readonly entityID: number
-    readonly _string1: string
+    readonly username: string
     readonly mapSeed: bigint
     readonly dimension: number
     constructor(buffer: OBuffer)
@@ -216,7 +225,7 @@ export class LoginRequest extends Packet
         
         
         this.entityID = buffer.readInt()
-        this._string1 = buffer.readString16()
+        this.username = buffer.readString16()
         this.mapSeed = buffer.readLong()
         this.dimension = buffer.readByte()
     }
@@ -238,7 +247,7 @@ export class ChatMessage extends Packet
     constructor(buffer: OBuffer)
     {
         super(buffer,0x03)
-        this.message = buffer.readString16()
+        this.message = buffer.readString16(119)
     }
 }
 export class TimeUpdate extends Packet
@@ -858,13 +867,7 @@ export class MapChunk extends Packet
         var arr = new Array(this.c_size)
         arr = buffer.readFully(arr)
         this.c_data_size = this.size_x*this.size_y*this.size_z*2.5
-        this.c_data = new Array(this.c_data_size)
-        /** TODO: Fix this shit */
-        buffer.read_offset += this.c_size
-        //const inflate = createInflate()
-        //inflate.write(buffer.getBuffer().subarray(buffer.read_offset,this.c_size))
-        //const uncompressed = new OBuffer(inflate.read() as Buffer)
-        //this.c_data = uncompressed.readFully(this.c_data)
+        this.c_data = [...inflateSync(new Uint8Array(arr))]
     }
 }
 export class MultiBlockChange extends Packet

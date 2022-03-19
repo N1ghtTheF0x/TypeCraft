@@ -9,7 +9,7 @@
     "start": "ts-node src/index.ts",
     "server": "ts-node src/server.ts",
     "mc-server": "cd server && java -jar server.jar nogui",
-    "buildWeb": "browserify -p [ tsify ] src/web/index.ts > dist/minecraft.js"
+    "buildWeb": "browserify -p [ tsify ] -d src/web/index.ts > dist/minecraft.js"
   },
   "keywords": [
     "minecraft",

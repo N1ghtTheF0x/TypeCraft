@@ -45,6 +45,10 @@ export namespace Packet
         
         writeFileSync(file,json,{encoding:"utf-8",flag:"wx"})
     }
+    export function getTypeName(type: Type)
+    {
+        return Type[type]
+    }
     export enum Type
     {
         KeepAlive = 0x00,
@@ -105,4 +109,8 @@ export namespace Packet
         IncrementStatistic = 0x84,
         DisconnectKick = 0xFF
     }
+    export type TypeString = keyof typeof Type
+    export type PacketEvents = {
+        [key in TypeString]: (packet: Packet) => void;
+    };
 }

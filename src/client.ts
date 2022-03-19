@@ -18,8 +18,14 @@ export class Client extends EventEmitter
     connected: boolean
     loggedIn: boolean
     spawned: boolean
-
+    // TimeUpdate
+    ticks: bigint = 0n
+    protected __lastTicks: bigint = 0n
+    protected __ticks: bigint = 0n
     protected ka_interval: NodeJS.Timer
+    // Init Packets
+    handshake: Server.Handshake
+    loginRequest: Server.LoginRequest
     constructor(readonly username: string,host: string = "127.0.0.1",port: number = 25565)
     {
         super()
@@ -35,6 +41,9 @@ export class Client extends EventEmitter
         this.socket.on("ready",this.onReady.bind(this))
         this.socket.on("timeout",this.onTimeout.bind(this))
         this.socket.on("end",this.onEnd.bind(this))
+        this.on(Packet.getTypeName(Packet.Type.TimeUpdate),this.__doTimeUpdate.bind(this))
+        this.once(Packet.getTypeName(Packet.Type.Handshake),this.__doHandshake.bind(this))
+        this.once(Packet.getTypeName(Packet.Type.LoginRequest),this.__doLogin.bind(this))
     }
     connect()
     {
@@ -44,11 +53,10 @@ export class Client extends EventEmitter
         })
         return this
     }
-    sendPacket(packet: Packet,cb: ServerResponse = () => {})
+    sendPacket(packet: Packet)
     {
         const buf = packet.toBuffer()
-        this.socket.write(buf.getBuffer(),console.error)
-        this.socket.once("data",(d) => cb(new OBuffer(d)))
+        this.socket.write(buf.getBuffer())
     }
     private sendKeepAlivePacket()
     {
@@ -61,8 +69,8 @@ export class Client extends EventEmitter
     private onData(data: Buffer)
     {
         const buffer = new OBuffer(data)
-        //console.info(buffer.getBuffer())
         const packets = Server.parse(buffer)
+        this.emit("Packets",packets)
         for(const packet of packets)
         {
             this.emit(Packet.Type[packet.id],packet)
@@ -93,24 +101,31 @@ export class Client extends EventEmitter
     {
         console.info(`[Client] End of Connection`)
         clearInterval(this.ka_interval)
-        this.emit("end")
+        this.emit("End")
     }
     private onConnect()
     {
         console.info(`[Client] Connecting...`)
         this.connected = true
-        this.sendPacket(new Handshake(this.username),this.__doHandshake.bind(this))
+        this.sendPacket(new Handshake(this.username))
     }
-    private __doHandshake(data: OBuffer)
+    private __doHandshake(packet: Server.Handshake)
     {
-        const res = Server.parse(data)
-        console.dir(res)
-        this.sendPacket(new LoginRequest(this.username),this.__doLogin.bind(this))
+        this.handshake = packet
+        console.info(`[Client] Handshake Hash: ${packet.connectionHash}`)
+        this.sendPacket(new LoginRequest(this.username))
     }
-    private __doLogin(data: OBuffer)
+    private __doLogin(packet: Server.LoginRequest)
     {
-        const res = Server.parse(data)
-        console.dir(res)
-        this.ka_interval = setInterval(this.sendKeepAlivePacket,(TPS*60)*1000)
+        this.loginRequest = packet
+        console.info(`[Client] Connected as Entity ID ${packet.entityID}`)
+        this.emit("Ready")
+        this.ka_interval = setInterval(this.sendKeepAlivePacket.bind(this),TPS*30)
+    }
+    private __doTimeUpdate(packet: Server.TimeUpdate)
+    {
+        this.__ticks = packet.time
+        if(this.__lastTicks != 0n) this.ticks += this.__ticks - this.__lastTicks
+        this.__lastTicks = this.__ticks
     }
 }
