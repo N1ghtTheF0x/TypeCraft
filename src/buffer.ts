@@ -1,17 +1,18 @@
 import { DataType } from "./types"
+import { MUtf8Decoder, MUtf8Encoder } from "mutf-8"
 
 export class OBuffer
 {
-    protected buf: globalThis.Buffer
+    protected buf: Buffer
     read_offset: number = 0
     write_offset: number = 0
     protected __read_and_delete: boolean = false
     constructor(size: number)
-    constructor(buf: globalThis.Buffer)
-    constructor(a: number | globalThis.Buffer)
+    constructor(buf: Buffer)
+    constructor(a: number | Buffer)
     {
-        if(typeof a == "number") this.buf = globalThis.Buffer.alloc(a)
-        if(a instanceof globalThis.Buffer) this.buf = a
+        if(typeof a == "number") this.buf = Buffer.alloc(a)
+        if(a instanceof Buffer) this.buf = a
     }
     setReadAndDelete(state: boolean = !this.__read_and_delete)
     {
@@ -116,9 +117,19 @@ export class OBuffer
         }
         return String.fromCharCode(...chars)
     }
+    writeString8(str: string)
+    {
+        const encoder = new MUtf8Encoder()
+        const code = encoder.encode(str)
+        this.buf = Buffer.concat([this.buf,code])
+        return this
+    }
     readString8()
     {
-        
+        const decoder = new MUtf8Decoder("mutf-8")
+        const length = this.readShort()
+        const buffer = this.buf.slice(this.read_offset,length)
+        return decoder.decode(buffer)
     }
     writeBool(bool: boolean)
     {

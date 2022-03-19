@@ -12,7 +12,7 @@ export abstract class Packet extends _Packet
         super(id)
         this.raw = buffer
         this.checkID(buffer.readByte())
-        
+        _Packet.serverside.set(id,typeof this as unknown as typeof _Packet)
     }
     toBuffer()
     {
@@ -161,9 +161,6 @@ export function parse(data: OBuffer)
             break
         case Packet.Type.CloseWindow:
             arr.push(new CloseWindow(data))
-            break
-        case Packet.Type.WindowClick:
-            arr.push(new WindowClick(data))
             break
         case Packet.Type.SetSlot:
             arr.push(new SetSlot(data))
@@ -832,23 +829,42 @@ export class MapChunk extends Packet
     readonly size_z: number
     readonly c_size: number
     readonly c_data: number[]
+
+    readonly chunkX: number
+    readonly chunkY: number
+    readonly chunkZ: number
+
+    readonly startX: number
+    readonly startY: number
+    readonly startZ: number
+
+    readonly c_data_size: number
     constructor(buffer: OBuffer)
     {
         super(buffer,0x33)
         this.x = buffer.readInt()
         this.y = buffer.readShort()
         this.z = buffer.readInt()
+        this.chunkX = this.x >> 4
+        this.chunkY = this.y >> 7
+        this.chunkZ = this.z >> 4
+        this.startX = this.x & 15
+        this.startY = this.y & 127
+        this.startZ = this.z & 15
         this.size_x = buffer.readByte()+1
         this.size_y = buffer.readByte()+1
         this.size_z = buffer.readByte()+1
         this.c_size = buffer.readInt()
         var arr = new Array(this.c_size)
         arr = buffer.readFully(arr)
-        this.c_data = new Array((this.size_x*this.size_y*this.size_z*5)/2)
-        const inflate = createInflate()
-        inflate.write(buffer.getBuffer().subarray(buffer.read_offset,this.c_size))
-        const uncompressed = new OBuffer(inflate.read() as Buffer)
-        this.c_data = uncompressed.readFully(this.c_data)
+        this.c_data_size = this.size_x*this.size_y*this.size_z*2.5
+        this.c_data = new Array(this.c_data_size)
+        /** TODO: Fix this shit */
+        buffer.read_offset += this.c_size
+        //const inflate = createInflate()
+        //inflate.write(buffer.getBuffer().subarray(buffer.read_offset,this.c_size))
+        //const uncompressed = new OBuffer(inflate.read() as Buffer)
+        //this.c_data = uncompressed.readFully(this.c_data)
     }
 }
 export class MultiBlockChange extends Packet
@@ -1023,5 +1039,144 @@ export class OpenWindow extends Packet
         this.type = buffer.readByte()
         this.title = buffer.readString8()
         this.slots = buffer.readByte()
+    }
+}
+export class CloseWindow extends Packet
+{
+    readonly windowID: number
+    constructor(buffer: OBuffer)
+    {
+        super(buffer,0x65)
+        this.windowID = buffer.readByte()
+    }
+}
+export class SetSlot extends Packet
+{
+    readonly windowID: number
+    readonly slot: number
+    readonly itemID: number
+    readonly itemCount: number
+    readonly itemUses: number
+    constructor(buffer: OBuffer)
+    {
+        super(buffer,0x67)
+        this.windowID = buffer.readByte()
+        this.slot = buffer.readShort()
+        this.itemID = buffer.readShort()
+        if(this.itemID != -1)
+        {
+            this.itemCount = buffer.readByte()
+            this.itemUses = buffer.readShort()
+        }
+    }
+}
+export class WindowItems extends Packet
+{
+    readonly windowID: number
+    readonly count: number
+    readonly payload: WindowItems.Item[]
+    constructor(buffer: OBuffer)
+    {
+        super(buffer,0x68)
+        this.windowID = buffer.readByte()
+        this.count = buffer.readShort()
+        this.payload = new Array(this.count)
+        for(var index = 0;index < this.count;index++)
+        {
+            const itemID = buffer.readShort()
+            if(itemID != -1)
+            {
+                const count = buffer.readByte()
+                const uses = buffer.readShort()
+                this.payload[index] = {itemID,count,uses}
+            }
+            else this.payload[index] = {}
+        }
+    }
+}
+export namespace WindowItems
+{
+    export interface Item
+    {
+        itemID?: number
+        count?: number
+        uses?: number
+    }
+}
+export class UpdateProgressBar extends Packet
+{
+    readonly windowID: number
+    readonly bar: number
+    readonly value: number
+    constructor(buffer: OBuffer)
+    {
+        super(buffer,0x69)
+        this.windowID = buffer.readByte()
+        this.bar = buffer.readShort()
+        this.value = buffer.readShort()
+    }
+}
+export class Transaction extends Packet
+{
+    readonly windowID: number
+    readonly action: number
+    readonly accepted: boolean
+    constructor(buffer: OBuffer)
+    {
+        super(buffer,0x6A)
+        this.windowID = buffer.readByte()
+        this.action = buffer.readShort()
+        this.accepted = buffer.readBool()
+    }
+}
+export class UpdateSign extends Packet
+{
+    readonly x: number
+    readonly y: number
+    readonly z: number
+    readonly text: [string,string,string,string]
+    constructor(buffer: OBuffer)
+    {
+        super(buffer,0x82)
+        this.x = buffer.readInt()
+        this.y = buffer.readShort()
+        this.z = buffer.readInt()
+        this.text = [buffer.readString16(),buffer.readString16(),buffer.readString16(),buffer.readString16()]
+    }
+}
+export class ItemData extends Packet
+{
+    readonly type: number
+    readonly itemID: number
+    readonly text_length: number
+    readonly text: number[]
+    constructor(buffer: OBuffer)
+    {
+        super(buffer,0x83)
+        this.type = buffer.readShort()
+        this.itemID = buffer.readShort()
+        this.text_length = buffer.readByte()
+        this.text = new Array(this.text_length & 0xff)
+        this.text = buffer.readFully(this.text)
+    }
+}
+export class IncrementStatistic extends Packet
+{
+    readonly statisticID: number
+    readonly amount: number
+    constructor(buffer: OBuffer)
+    {
+        super(buffer,0xc8)
+        this.statisticID = buffer.readInt()
+        this.amount = buffer.readByte()
+    }
+}
+export class DisconnectKick extends Packet
+{
+    readonly reason: string
+    constructor(buffer: OBuffer)
+    {
+        super(buffer,0xff)
+        this.reason = buffer.readString16()
     }
 }

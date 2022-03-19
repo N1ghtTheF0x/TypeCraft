@@ -5,8 +5,7 @@
         "jsx": "preserve",
         "strictFunctionTypes": true,
         "outDir": "dist",
-        "sourceMap": true,
-        "lib": ["ESNext"]
+        "sourceMap": true
     },
     "exclude": [
         "node_modules",
