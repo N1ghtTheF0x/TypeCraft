@@ -26,6 +26,8 @@ export class Client extends EventEmitter
     // Init Packets
     handshake: Server.Handshake
     loginRequest: Server.LoginRequest
+    // Packet Count
+    packetCount: number = -1
     constructor(readonly username: string,host: string = "127.0.0.1",port: number = 25565)
     {
         super()
@@ -70,6 +72,7 @@ export class Client extends EventEmitter
     {
         const buffer = new OBuffer(data)
         const packets = Server.parse(buffer)
+        this.packetCount += packets.length
         this.emit("Packets",packets)
         for(const packet of packets)
         {

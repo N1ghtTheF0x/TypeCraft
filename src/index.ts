@@ -14,26 +14,22 @@ const username = randomBytes(4).toString("hex")
 
 const client = new Client(username,host,port)
 
-const list = []
+/*
 
-client.on("Ready",function()
-{
-    setTimeout(function()
-    {
-        writeFileSync("packets.json",JSON.stringify(list,function(key,value)
-        {
-            if(typeof value == "bigint") return value.toString()
-            if(key == "id") return Packet.Type[value]
-            if(value instanceof OBuffer) return `Buffer[${value.getBuffer().length}]`
-            return value
-        }),"utf-8")
-        process.exit()
-    },1000*5)
-})
+TODO: Find out why the server is not sending a 0x0d? Look at source code of Minecraft?
+
+*/
 
 client.on("Packets",function(packets: Packet[])
 {
-    list.push(...packets)
+    for(const packet of packets)
+    {
+        if(packet.id == 0x0d)
+        {
+            console.dir(packet)
+            process.exit()
+        }
+    }
 })
 
 client.on("end",function()
